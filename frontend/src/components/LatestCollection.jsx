@@ -1,13 +1,15 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {ShopContext} from "../context/ShopContext.jsx";
 import Title from "./Title.jsx";
+import ProductItem from "./ProductItem.jsx";
+import {products} from "../assets/assets.js";
 
 const LatestCollection = () => {
 
-    const {prodcuts} = useContext(ShopContext);
+    const {products} = useContext(ShopContext);
     const [latestProduct, setLatestProduct] = useState([]);
     useEffect(() => {
-        setLatestProduct(prodcuts.slice(0,10));
+        setLatestProduct(products.slice(0,10));
     },[])
     return (
         <div className='my-10'>
@@ -17,6 +19,14 @@ const LatestCollection = () => {
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry lorem
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry lorem
                 </p>
+            </div>
+            {/* Renderring Products */}
+            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6 '>
+                {
+                    latestProduct.map((item,index)=>(
+                        <ProductItem key={index} id={item._id} image={item.image} name={item.name} price={item.price} />
+                    ))
+                }
             </div>
 
 
