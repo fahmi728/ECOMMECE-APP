@@ -3,6 +3,7 @@ import usermodel from "../models/userModel.js";
 import validator from "validator";
 import bcrypt  from "bcrypt";
 import jwt from "jsonwebtoken";
+import err from "multer/lib/multer-error.js";
 
 const createToken = (id)=>{
     return jwt.sign({id}, process.env.JWT_SECRET, {expiresIn: "2d"});
@@ -11,6 +12,27 @@ const createToken = (id)=>{
 //Route for user Login
 const loginUser =async (req, res)=>{
 
+    try{
+        const { email, password } = req.body;
+        const user = await usermodel.findOne({email});
+        if(!user){
+            return res.json({success:false,message:"User doesn't exists"});
+        }
+
+        const isMatch = await bcrypt.compare(password,user.password);
+
+        if (isMatch){
+            const token = createToken(user._id)
+            return res.json({success:true,token});
+        }else{
+            return res.json({success:false,message:"Invalid Credentials"});
+        }
+
+
+
+    }catch (e) {
+
+    }
 }
 
 
@@ -63,6 +85,23 @@ const registerUser= async (req,res)=>{
 
 //Route for admin login
 const adminLogin = async (req,res)=>{
+    try{
+
+        const {email, password} = req.body;
+
+        if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
+
+            const token = jwt.sign(email+password,process.env.JWT_SECRET);
+            res.json({success:true,token});
+        }else{
+            res.json({success:false,message:"Invalid Credentials"});
+        }
+
+    }catch (e) {
+        console.log(e);
+        res.json({success:false,message:e.message});
+
+    }
 
 }
 
